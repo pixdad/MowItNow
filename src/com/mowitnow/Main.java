@@ -1,20 +1,36 @@
 package com.mowitnow;
 
-import com.mowitnow.objects.MowConfigObject;
+import com.mowitnow.core.Mow;
+import com.mowitnow.io.InputParser;
+import com.mowitnow.io.OutputGenerator;
+
+import java.io.IOException;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        String filePath = args[0];
+        if(args.length == 0) {
+            System.out.println("No configuration file provided");
+            System.out.println("First argument should be the path to the configuration file");
+            return;
+        }
+
+        List<Mow> mows = null;
 
         //1. Parse the file into memory :
-        MowConfigObject input = InputParser.parseFromPath(filePath);
+        String filePath = args[0];
+        try {
+            mows = InputParser.parseFromPath(filePath);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
 
-        //2. Compute the mows' positions
-        MowResultObject result = MowingCalculator.process(input);
-
-        //3. Show the results
-        OutputGenerator.render(result);
+        //2. Process the commands of each mow, then render the new position
+        for (Mow mow : mows) {
+            mow.execute();
+            OutputGenerator.render(mow);
+        }
 
     }
 
