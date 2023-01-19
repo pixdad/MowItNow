@@ -3,6 +3,10 @@ package com.mowitnow.core;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents the behavior of a Mow defined in the input file.
+ * An object of this class has a position, a direction, and can execute a list of commands.
+ */
 public class Mow {
     private final int xMax;
     private final int yMax;

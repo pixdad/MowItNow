@@ -18,32 +18,38 @@ public class InputParser {
         int xMax, yMax;
 
         //1. Retrieve the size of the lawn
+        line = reader.readLine();
+        String[] size = line.split(" ");
         try {
-            line = reader.readLine();
-            String[] size = line.split(" ");
             xMax = Integer.parseInt(size[0]);
             yMax = Integer.parseInt(size[1]);
-
-        } catch (IOException e) {
-            throw new IOException("Input file does not follow the proper text format for the lawn size definition");
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Formating error on lawn size configuration line : \""  + line + "\"");
         }
 
         //2. For each couple of two lines, parse and create a Mow object
         String posLine, commandLine;
-        try {
-            while((posLine = reader.readLine()) != null && (commandLine = reader.readLine()) != null) {
-                String[] pos = posLine.split(" ");
-                Mow mow = new Mow(xMax, yMax, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Direction.valueOf(pos[2]) );
-                for(char commandStr : commandLine.toCharArray()) {
+        while((posLine = reader.readLine()) != null && (commandLine = reader.readLine()) != null) {
+            String[] pos = posLine.split(" ");
+            Mow mow;
+
+            try {
+                mow = new Mow(xMax, yMax, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Direction.valueOf(pos[2]) );
+            }
+            catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+                throw new IllegalArgumentException("Formating error on mow position configuration line : \""  + posLine + "\"");
+            }
+
+            try {
+                for (char commandStr : commandLine.toCharArray()) {
                     mow.addCommand(Command.valueOf(String.valueOf(commandStr)));
                 }
-                mows.add(mow);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Formating error on mow commands configuration line : \""  + commandLine + "\"");
             }
-        } catch (IOException e) {
-            throw new IOException("Input file does not follow the proper text format for the Mow configuration");
+
+            mows.add(mow);
         }
-
-
         return mows;
     }
 
